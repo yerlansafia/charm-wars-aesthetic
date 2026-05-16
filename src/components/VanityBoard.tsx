@@ -6,7 +6,7 @@ import {
 } from "@/lib/checkers";
 import { CharmPiece } from "./CharmPiece";
 import { ComboLayer, type FloatingText } from "./ComboLayer";
-import { CAPTURE_TEXTS, COMBO_TEXTS, KING_TEXTS, rand, type CharmId } from "@/lib/copy";
+import { CAPTURE_TEXTS, COMBO_TEXTS, KING_TEXTS, rand } from "@/lib/copy";
 import { loadProfile, saveProfile } from "@/lib/storage";
 import type { GameEvent } from "@/lib/bella";
 
@@ -54,9 +54,18 @@ export function VanityBoard({ difficulty, onMatchEnd }: Props) {
   }
 
   function performMove(move: Move) {
+    // ——— Tactical pre-analysis for "you" ———
+    let missedDoubleCapture = false;
+    if (turn === "you") {
+      const allYour = allLegalMoves(board, "you");
+      const maxCaps = allYour.reduce((m, x) => Math.max(m, x.captures.length), 0);
+      if (maxCaps >= 2 && move.captures.length < 2) missedDoubleCapture = true;
+    }
+
     const res = applyMove(board, move);
     setBoard(res.board);
 
+    // Inventory: persist every charm captured by the player
     if (turn === "you" && res.capturedCharms.length) {
       const p = loadProfile();
       saveProfile({ ...p, inventory: [...p.inventory, ...res.capturedCharms] });
@@ -74,12 +83,29 @@ export function VanityBoard({ difficulty, onMatchEnd }: Props) {
       setTimeout(() => setKingOverlay(null), 1600);
     }
 
+    // ——— Post-move analysis ———
+    let enabledOpponentPromotion = false;
+    let baitedCapture = false;
+    if (turn === "you" && !res.canContinue) {
+      const bellaMoves = allLegalMoves(res.board, "bella");
+      enabledOpponentPromotion = bellaMoves.some(
+        m => !res.board[m.fromR][m.fromC]?.king && m.toR === SIZE - 1
+      );
+      if (res.capturedCharms.length > 0) {
+        const bellaCaptures = bellaMoves.filter(m => m.captures.length > 0);
+        if (bellaCaptures.length === 0) baitedCapture = true;
+      }
+    }
+
     events.current.push({
       turn: events.current.length + 1,
       side: turn,
       captures: res.capturedCharms.length,
       promoted: res.promoted,
       chainLengthAfter: res.movedPiece.chain.length + res.capturedCharms.length,
+      missedDoubleCapture,
+      enabledOpponentPromotion,
+      baitedCapture,
     });
 
     if (res.canContinue) {
@@ -152,8 +178,11 @@ export function VanityBoard({ difficulty, onMatchEnd }: Props) {
 
       <div
         ref={boardRef}
-        className="relative aspect-square w-full rounded-2xl overflow-hidden border border-border shadow-soft bg-ivory"
-        style={{ boxShadow: "var(--shadow-soft), inset 0 0 0 1px color-mix(in oklab, var(--champagne) 50%, transparent)" }}
+        className="relative aspect-square w-full rounded-2xl overflow-hidden border border-border shadow-soft"
+        style={{
+          background: "var(--ivory)",
+          boxShadow: "var(--shadow-soft), inset 0 0 0 1px color-mix(in oklab, var(--accent-rose) 35%, transparent)",
+        }}
       >
         <div className="grid grid-cols-8 grid-rows-8 w-full h-full">
           {Array.from({ length: SIZE * SIZE }).map((_, idx) => {
@@ -167,8 +196,11 @@ export function VanityBoard({ difficulty, onMatchEnd }: Props) {
               <button
                 key={idx}
                 onClick={() => onCellClick(r, c)}
-                className={`relative grid place-items-center transition-colors ${dark ? "bg-tile-dark" : "bg-tile-light"} ${isTarget ? "ring-2 ring-inset ring-ink/40" : ""}`}
-                style={{ outline: "none" }}
+                className={`relative grid place-items-center transition-colors ${isTarget ? "ring-2 ring-inset ring-ink/40" : ""}`}
+                style={{
+                  background: dark ? "var(--tile-dark)" : "var(--tile-light)",
+                  outline: "none",
+                }}
               >
                 {piece && (
                   <CharmPiece
