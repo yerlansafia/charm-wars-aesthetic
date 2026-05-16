@@ -9,8 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SpectateRouteImport } from './routes/spectate'
+import { Route as PlayRouteImport } from './routes/play'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as BagRouteImport } from './routes/bag'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SpectateRoute = SpectateRouteImport.update({
+  id: '/spectate',
+  path: '/spectate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlayRoute = PlayRouteImport.update({
+  id: '/play',
+  path: '/play',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BagRoute = BagRouteImport.update({
+  id: '/bag',
+  path: '/bag',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +43,72 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bag': typeof BagRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/play': typeof PlayRoute
+  '/spectate': typeof SpectateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bag': typeof BagRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/play': typeof PlayRoute
+  '/spectate': typeof SpectateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/bag': typeof BagRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/play': typeof PlayRoute
+  '/spectate': typeof SpectateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/bag' | '/leaderboard' | '/play' | '/spectate'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/bag' | '/leaderboard' | '/play' | '/spectate'
+  id: '__root__' | '/' | '/bag' | '/leaderboard' | '/play' | '/spectate'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BagRoute: typeof BagRoute
+  LeaderboardRoute: typeof LeaderboardRoute
+  PlayRoute: typeof PlayRoute
+  SpectateRoute: typeof SpectateRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/spectate': {
+      id: '/spectate'
+      path: '/spectate'
+      fullPath: '/spectate'
+      preLoaderRoute: typeof SpectateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/play': {
+      id: '/play'
+      path: '/play'
+      fullPath: '/play'
+      preLoaderRoute: typeof PlayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bag': {
+      id: '/bag'
+      path: '/bag'
+      fullPath: '/bag'
+      preLoaderRoute: typeof BagRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,17 +121,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BagRoute: BagRoute,
+  LeaderboardRoute: LeaderboardRoute,
+  PlayRoute: PlayRoute,
+  SpectateRoute: SpectateRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
