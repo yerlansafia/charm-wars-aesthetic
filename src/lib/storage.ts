@@ -1,12 +1,14 @@
 import type { CharmId } from "./copy";
+import type { MatchRecord } from "./bella";
 
 const KEY = "the-attachment/v1";
+const HISTORY_KEY = "the-attachment/history/v1";
 
 export type Profile = {
   name: string;
   city: string;
-  aura: number;          // ELO replacement
-  inventory: CharmId[];  // every captured charm, permanently kept
+  aura: number;
+  inventory: CharmId[];   // every captured charm, permanently kept
   wins: number;
   losses: number;
 };
@@ -35,9 +37,17 @@ export function saveProfile(p: Profile) {
   window.dispatchEvent(new Event("attachment:profile"));
 }
 
-export function useProfileSync(cb: () => void) {
-  if (typeof window === "undefined") return () => {};
-  const h = () => cb();
-  window.addEventListener("attachment:profile", h);
-  return () => window.removeEventListener("attachment:profile", h);
+export function loadHistory(): MatchRecord[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    return raw ? (JSON.parse(raw) as MatchRecord[]) : [];
+  } catch { return []; }
+}
+
+export function pushHistory(rec: MatchRecord) {
+  if (typeof window === "undefined") return;
+  const list = [rec, ...loadHistory()].slice(0, 30);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
+  window.dispatchEvent(new Event("attachment:history"));
 }
