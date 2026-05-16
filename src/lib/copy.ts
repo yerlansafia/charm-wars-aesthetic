@@ -81,8 +81,8 @@ export const AURA_TIERS = [
   { min: 2200, name: "Weaponized Girlhood" },
 ] as const;
 
-export function tierFor(aura: number) {
-  let t = AURA_TIERS[0];
+export function tierFor(aura: number): { min: number; name: string } {
+  let t: { min: number; name: string } = AURA_TIERS[0];
   for (const tier of AURA_TIERS) if (aura >= tier.min) t = tier;
   return t;
 }
