@@ -124,16 +124,16 @@ function Lobby() {
 
         {/* Side cards */}
         <section className="mt-16 grid md:grid-cols-3 gap-4">
-          <Card title="Get Deluxe Charms" tag="Upgrade to Pro"
-            body="Unlock Liquid Chrome drops, Pinko bag tags, custom chain links. Pure cosmetic damage."
-            cta="Preview store"
+          <Card title="Get Deluxe Charms" tag="The Vanity Drop"
+            body="Liquid Chrome, Pinko bag tags, full Rhode unlock. Cosmetic damage only."
+            cta="Open store"
             href="/bag" />
-          <Card title="Lip Gloss Spectator League" tag="Spectator mode"
-            body="Watch top-tier matches with ASMR clinks and glitter trails. No commentary, only ambience."
-            cta="Find a match"
-            href="/spectate" />
-          <Card title="Bella Hadid Coaching" tag="AI review"
-            body="After every match, Bella reads your mistakes with luxury detachment. You'll feel seen — and judged."
+          <Card title="Bella's Verdict" tag="AI Review"
+            body="Bella Hadid reviews every match. She'll tell you which moves lowered your aura. Brutal, useful, chic."
+            cta="Open AI Review"
+            href="/review" />
+          <Card title="Bella Hadid Coaching" tag="vs AI"
+            body="Three difficulty tiers. Each one reacts to your choices with a real-time quote. Try not to embarrass the chain."
             cta="Try Main Character"
             href="/play" />
         </section>
