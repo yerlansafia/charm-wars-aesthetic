@@ -160,9 +160,7 @@ export function VanityBoard({ difficulty, onMatchEnd, onMetrics, reactionSignal 
   // Floating reaction text from external Quick Reactions
   useEffect(() => {
     if (!reactionSignal) return;
-    const el = boardRef.current; if (!el) return;
-    const rect = el.getBoundingClientRect();
-    pushFloat(reactionSignal.text, rect.height / 2 / (rect.width / SIZE) + 0.5, SIZE / 2, "loud");
+    pushFloat(reactionSignal.text, SIZE / 2 - 0.5, SIZE / 2 - 0.5, "loud");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reactionSignal?.id]);
 
