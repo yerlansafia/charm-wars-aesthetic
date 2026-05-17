@@ -154,8 +154,20 @@ function PlayPage() {
               <div className="text-[10px] uppercase tracking-[0.24em] text-mocha">Coach</div>
               <div className="serif text-[16px]">Bella Hadid</div>
               <div className="text-[11px] text-mocha italic serif">"Don't embarrass the chain."</div>
+              <div className="mt-1.5 flex flex-wrap gap-1">
+                <span className="text-[9px] uppercase tracking-[0.18em] px-2 py-0.5 rounded-full bg-cream border border-border">Almaty</span>
+                <span className="text-[9px] uppercase tracking-[0.18em] px-2 py-0.5 rounded-full bg-ink text-ivory">Pinterest Threat</span>
+              </div>
             </div>
           </div>
+
+          <GameMetrics
+            moves={metrics.moves}
+            yourCaptures={metrics.yourCaptures}
+            bellaCaptures={metrics.bellaCaptures}
+            onReact={triggerReaction}
+            lastReaction={reaction}
+          />
           <div className="p-5 rounded-2xl bg-card border border-border shadow-soft">
             <div className="text-[10px] uppercase tracking-[0.24em] text-mocha">Rules, briefly</div>
             <ul className="mt-3 text-[13px] text-mocha space-y-2 leading-relaxed">
