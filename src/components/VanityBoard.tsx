@@ -145,6 +145,27 @@ export function VanityBoard({ difficulty, onMatchEnd, onMetrics, reactionSignal 
     return () => clearTimeout(t);
   }, [turn, board, difficulty]);
 
+  // Emit live metrics to parent
+  useEffect(() => {
+    if (!onMetrics) return;
+    let moves = 0, you = 0, bella = 0;
+    for (const e of events.current) {
+      moves++;
+      if (e.side === "you") you += e.captures;
+      else bella += e.captures;
+    }
+    onMetrics({ moves, yourCaptures: you, bellaCaptures: bella });
+  }, [board, onMetrics]);
+
+  // Floating reaction text from external Quick Reactions
+  useEffect(() => {
+    if (!reactionSignal) return;
+    const el = boardRef.current; if (!el) return;
+    const rect = el.getBoundingClientRect();
+    pushFloat(reactionSignal.text, rect.height / 2 / (rect.width / SIZE) + 0.5, SIZE / 2, "loud");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reactionSignal?.id]);
+
   function onCellClick(r: number, c: number) {
     if (turn !== "you") return;
     const piece = board[r][c];
