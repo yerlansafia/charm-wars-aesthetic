@@ -149,8 +149,8 @@ function PlayPage() {
 
         <aside className="space-y-4">
           <div className="p-5 rounded-2xl bg-card border border-border shadow-soft flex items-center gap-4">
-            <BellaAvatar size={56} />
-            <div>
+            <BellaAvatar size={64} />
+            <div className="min-w-0">
               <div className="text-[10px] uppercase tracking-[0.24em] text-mocha">Coach</div>
               <div className="serif text-[16px]">Bella Hadid</div>
               <div className="text-[11px] text-mocha italic serif">"Don't embarrass the chain."</div>
