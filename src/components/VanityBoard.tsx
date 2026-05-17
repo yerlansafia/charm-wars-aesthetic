@@ -13,9 +13,11 @@ import type { GameEvent } from "@/lib/bella";
 type Props = {
   difficulty: Difficulty;
   onMatchEnd: (result: "you" | "bella" | "draw", events: GameEvent[]) => void;
+  onMetrics?: (m: { moves: number; yourCaptures: number; bellaCaptures: number }) => void;
+  reactionSignal?: { id: number; text: string } | null;
 };
 
-export function VanityBoard({ difficulty, onMatchEnd }: Props) {
+export function VanityBoard({ difficulty, onMatchEnd, onMetrics, reactionSignal }: Props) {
   const [board, setBoard] = useState<Board>(() => initialBoard());
   const [turn, setTurn] = useState<Side>("you");
   const [selected, setSelected] = useState<{ r: number; c: number } | null>(null);
