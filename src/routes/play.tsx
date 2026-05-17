@@ -6,6 +6,7 @@ import { Nav } from "@/components/Nav";
 import { VanityBoard } from "@/components/VanityBoard";
 import { Receipt } from "@/components/Receipt";
 import { BellaAvatar } from "@/components/BellaAvatar";
+import { GameMetrics, type Reaction } from "@/components/GameMetrics";
 import type { Difficulty } from "@/lib/checkers";
 import {
   summarize, bellaNotes, auraDelta, slayPercent, moveReview,
@@ -29,8 +30,17 @@ function PlayPage() {
   const [matchKey, setMatchKey] = useState(0);
   const [summary, setSummary] = useState<MatchSummary | null>(null);
   const [bellaToast, setBellaToast] = useState<string | null>(null);
+  const [metrics, setMetrics] = useState({ moves: 0, yourCaptures: 0, bellaCaptures: 0 });
+  const [reaction, setReaction] = useState<Reaction | null>(null);
+  const [reactionSignal, setReactionSignal] = useState<{ id: number; text: string } | null>(null);
   const receiptRef = useRef<HTMLDivElement>(null);
   const toastTimer = useRef<number | null>(null);
+
+  function triggerReaction(text: string, tone: "good" | "bad" | "combo") {
+    const id = Date.now();
+    setReaction({ id, text, tone });
+    setReactionSignal({ id, text });
+  }
 
   function showBellaToast(text: string) {
     setBellaToast(text);
@@ -44,6 +54,7 @@ function PlayPage() {
     setDiff(d);
     setSummary(null);
     setMatchKey(k => k + 1);
+    setMetrics({ moves: 0, yourCaptures: 0, bellaCaptures: 0 });
     showBellaToast(DIFF_QUOTES[d]);
   }
 
@@ -117,7 +128,13 @@ function PlayPage() {
             </div>
           </div>
 
-          <VanityBoard key={matchKey} difficulty={diff} onMatchEnd={handleEnd} />
+          <VanityBoard
+            key={matchKey}
+            difficulty={diff}
+            onMatchEnd={handleEnd}
+            onMetrics={setMetrics}
+            reactionSignal={reactionSignal}
+          />
 
           <div className="mt-5 flex items-center justify-between text-[12px] text-mocha">
             <span className="italic serif">"This board is becoming a purse."</span>
