@@ -7,7 +7,9 @@ export function CharmPiece({
   piece, selected, hint, size,
 }: { piece: Piece; selected?: boolean; hint?: boolean; size: number }) {
   const isYou = piece.side === "you";
-  const ring = selected ? "ring-2 ring-ink" : hint ? "ring-2 ring-mocha/40" : "";
+  const ring = selected
+    ? isYou ? "ring-2 ring-ink" : "ring-2 ring-[oklch(0.7_0.18_300)]"
+    : hint ? "ring-2 ring-mocha/40" : "";
 
   return (
     <motion.div
@@ -15,15 +17,23 @@ export function CharmPiece({
       initial={false}
       animate={{ scale: selected ? 1.08 : 1 }}
       transition={{ type: "spring", stiffness: 360, damping: 26 }}
-      className={`relative grid place-items-center rounded-full ${ring}`}
+      className={`relative grid place-items-center rounded-full ${ring} ${!isYou ? "cyber-disc" : ""} ${!isYou && selected ? "cyber-glitch" : ""}`}
       style={{
         width: size, height: size,
-        boxShadow: "var(--shadow-charm)",
+        boxShadow: isYou
+          ? "var(--shadow-charm)"
+          : "0 1px 2px rgb(0 0 0 / 0.35), 0 10px 30px -10px oklch(0.35 0.18 290 / 0.6), inset 0 1px 0 oklch(0.85 0.15 290 / 0.4)",
         background: isYou
           ? "radial-gradient(circle at 35% 30%, oklch(0.99 0.01 80), oklch(0.92 0.03 60))"
-          : "radial-gradient(circle at 35% 30%, oklch(0.96 0.02 320), oklch(0.78 0.05 350))",
+          : "radial-gradient(circle at 30% 25%, oklch(0.35 0.12 285) 0%, oklch(0.22 0.14 275) 45%, oklch(0.14 0.10 290) 100%)",
       }}
     >
+      {!isYou && (
+        <span
+          aria-hidden
+          className="absolute -inset-2 -z-10 rounded-full pointer-events-none cyber-trail"
+        />
+      )}
       {piece.king ? (
         // The It-Phone — accessorized luxury smartphone
         <div className="relative" style={{ width: size * 0.62, height: size * 0.78 }}>
