@@ -44,7 +44,7 @@ export function CharmPiece({
           <div className="absolute -bottom-3 -left-2 text-[10px]">💎</div>
         </div>
       ) : (
-        <CharmGlyph id={piece.charm} size={size} />
+        <CharmGlyph id={piece.charm} size={size} variant={isYou ? "clean" : "cyber"} />
       )}
 
       {/* Merged chain visualization — luxury metallic links trailing off */}
@@ -57,7 +57,7 @@ export function CharmPiece({
               style={{ width: size * 0.28, height: size * 0.28, boxShadow: "var(--shadow-chain)" }}
             >
               <span style={{ fontSize: size * 0.16 }}>
-                <CharmGlyph id={cid} size={size * 0.28} />
+                <CharmGlyph id={cid} size={size * 0.28} variant={isYou ? "clean" : "cyber"} />
               </span>
             </div>
           ))}
