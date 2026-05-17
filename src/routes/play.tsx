@@ -6,6 +6,7 @@ import { Nav } from "@/components/Nav";
 import { VanityBoard } from "@/components/VanityBoard";
 import { Receipt } from "@/components/Receipt";
 import { BellaAvatar } from "@/components/BellaAvatar";
+import { GameMetrics, type Reaction } from "@/components/GameMetrics";
 import type { Difficulty } from "@/lib/checkers";
 import {
   summarize, bellaNotes, auraDelta, slayPercent, moveReview,
@@ -29,8 +30,17 @@ function PlayPage() {
   const [matchKey, setMatchKey] = useState(0);
   const [summary, setSummary] = useState<MatchSummary | null>(null);
   const [bellaToast, setBellaToast] = useState<string | null>(null);
+  const [metrics, setMetrics] = useState({ moves: 0, yourCaptures: 0, bellaCaptures: 0 });
+  const [reaction, setReaction] = useState<Reaction | null>(null);
+  const [reactionSignal, setReactionSignal] = useState<{ id: number; text: string } | null>(null);
   const receiptRef = useRef<HTMLDivElement>(null);
   const toastTimer = useRef<number | null>(null);
+
+  function triggerReaction(text: string, tone: "good" | "bad" | "combo") {
+    const id = Date.now();
+    setReaction({ id, text, tone });
+    setReactionSignal({ id, text });
+  }
 
   function showBellaToast(text: string) {
     setBellaToast(text);
@@ -44,6 +54,7 @@ function PlayPage() {
     setDiff(d);
     setSummary(null);
     setMatchKey(k => k + 1);
+    setMetrics({ moves: 0, yourCaptures: 0, bellaCaptures: 0 });
     showBellaToast(DIFF_QUOTES[d]);
   }
 
@@ -117,12 +128,18 @@ function PlayPage() {
             </div>
           </div>
 
-          <VanityBoard key={matchKey} difficulty={diff} onMatchEnd={handleEnd} />
+          <VanityBoard
+            key={matchKey}
+            difficulty={diff}
+            onMatchEnd={handleEnd}
+            onMetrics={setMetrics}
+            reactionSignal={reactionSignal}
+          />
 
           <div className="mt-5 flex items-center justify-between text-[12px] text-mocha">
             <span className="italic serif">"This board is becoming a purse."</span>
             <button
-              onClick={() => { setSummary(null); setMatchKey(k => k + 1); }}
+              onClick={() => { setSummary(null); setMatchKey(k => k + 1); setMetrics({ moves: 0, yourCaptures: 0, bellaCaptures: 0 }); }}
               className="px-3 py-1.5 rounded-full bg-ivory border border-border hover:bg-cream"
             >
               Restart match
@@ -132,13 +149,25 @@ function PlayPage() {
 
         <aside className="space-y-4">
           <div className="p-5 rounded-2xl bg-card border border-border shadow-soft flex items-center gap-4">
-            <BellaAvatar size={56} />
-            <div>
+            <BellaAvatar size={64} />
+            <div className="min-w-0">
               <div className="text-[10px] uppercase tracking-[0.24em] text-mocha">Coach</div>
               <div className="serif text-[16px]">Bella Hadid</div>
               <div className="text-[11px] text-mocha italic serif">"Don't embarrass the chain."</div>
+              <div className="mt-1.5 flex flex-wrap gap-1">
+                <span className="text-[9px] uppercase tracking-[0.18em] px-2 py-0.5 rounded-full bg-cream border border-border">Almaty</span>
+                <span className="text-[9px] uppercase tracking-[0.18em] px-2 py-0.5 rounded-full bg-ink text-ivory">Pinterest Threat</span>
+              </div>
             </div>
           </div>
+
+          <GameMetrics
+            moves={metrics.moves}
+            yourCaptures={metrics.yourCaptures}
+            bellaCaptures={metrics.bellaCaptures}
+            onReact={triggerReaction}
+            lastReaction={reaction}
+          />
           <div className="p-5 rounded-2xl bg-card border border-border shadow-soft">
             <div className="text-[10px] uppercase tracking-[0.24em] text-mocha">Rules, briefly</div>
             <ul className="mt-3 text-[13px] text-mocha space-y-2 leading-relaxed">

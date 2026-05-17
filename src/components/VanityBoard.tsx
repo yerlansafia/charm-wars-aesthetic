@@ -13,9 +13,11 @@ import type { GameEvent } from "@/lib/bella";
 type Props = {
   difficulty: Difficulty;
   onMatchEnd: (result: "you" | "bella" | "draw", events: GameEvent[]) => void;
+  onMetrics?: (m: { moves: number; yourCaptures: number; bellaCaptures: number }) => void;
+  reactionSignal?: { id: number; text: string } | null;
 };
 
-export function VanityBoard({ difficulty, onMatchEnd }: Props) {
+export function VanityBoard({ difficulty, onMatchEnd, onMetrics, reactionSignal }: Props) {
   const [board, setBoard] = useState<Board>(() => initialBoard());
   const [turn, setTurn] = useState<Side>("you");
   const [selected, setSelected] = useState<{ r: number; c: number } | null>(null);
@@ -142,6 +144,25 @@ export function VanityBoard({ difficulty, onMatchEnd }: Props) {
     }, 650);
     return () => clearTimeout(t);
   }, [turn, board, difficulty]);
+
+  // Emit live metrics to parent
+  useEffect(() => {
+    if (!onMetrics) return;
+    let moves = 0, you = 0, bella = 0;
+    for (const e of events.current) {
+      moves++;
+      if (e.side === "you") you += e.captures;
+      else bella += e.captures;
+    }
+    onMetrics({ moves, yourCaptures: you, bellaCaptures: bella });
+  }, [board, onMetrics]);
+
+  // Floating reaction text from external Quick Reactions
+  useEffect(() => {
+    if (!reactionSignal) return;
+    pushFloat(reactionSignal.text, SIZE / 2 - 0.5, SIZE / 2 - 0.5, "loud");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reactionSignal?.id]);
 
   function onCellClick(r: number, c: number) {
     if (turn !== "you") return;
