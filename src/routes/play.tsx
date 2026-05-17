@@ -139,7 +139,7 @@ function PlayPage() {
           <div className="mt-5 flex items-center justify-between text-[12px] text-mocha">
             <span className="italic serif">"This board is becoming a purse."</span>
             <button
-              onClick={() => { setSummary(null); setMatchKey(k => k + 1); }}
+              onClick={() => { setSummary(null); setMatchKey(k => k + 1); setMetrics({ moves: 0, yourCaptures: 0, bellaCaptures: 0 }); }}
               className="px-3 py-1.5 rounded-full bg-ivory border border-border hover:bg-cream"
             >
               Restart match
